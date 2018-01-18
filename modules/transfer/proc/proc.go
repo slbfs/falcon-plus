@@ -17,6 +17,7 @@ package proc
 import (
 	nproc "github.com/toolkits/proc"
 	"log"
+	"github.com/open-falcon/falcon-plus/modules/transfer/sender"
 )
 
 // trace
@@ -103,10 +104,10 @@ func GetAll() []interface{} {
 	ret = append(ret, SendToEsFailCnt.Get())
 
 	// cache cnt
-	ret = append(ret, JudgeQueuesCnt.Get())
-	ret = append(ret, TsdbQueuesCnt.Get())
-	ret = append(ret, GraphQueuesCnt.Get())
-	ret = append(ret, EsQueuesCnt.Get())
+	ret = append(ret, len(sender.JudgeQueues))
+	ret = append(ret, sender.TsdbQueue.Len())
+	ret = append(ret, len(sender.GraphQueues))
+	ret = append(ret, sender.EsQueue.Len())
 
 	// http request
 	ret = append(ret, HistoryRequestCnt.Get())

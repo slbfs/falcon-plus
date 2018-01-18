@@ -15,8 +15,7 @@ type EsClient struct {
 }
 
 func CreateEsClient(connTimeout int, callTimeout int, urls []string) *EsClient {
-
-	client, err := elastic.NewClient(elastic.SetURL("http://192.168.138.125:9200"))
+	client, err := elastic.NewClient(elastic.SetURL(urls...))
 	if err != nil {
 		panic(err)
 		return nil

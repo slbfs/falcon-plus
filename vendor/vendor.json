@@ -205,6 +205,34 @@
 			"revisionTime": "2017-03-21T09:30:39Z"
 		},
 		{
+			"checksumSHA1": "HIF2ZYMMr2kzt5oE7SRjKefOIOc=",
+			"origin": "github.com/olivere/elastic/vendor/github.com/mailru/easyjson",
+			"path": "github.com/mailru/easyjson",
+			"revision": "e771061479895d1c7dffafd0d90ead7c9456d7cb",
+			"revisionTime": "2018-01-12T10:05:05Z"
+		},
+		{
+			"checksumSHA1": "T8soMJArSZrYnhmdpAnq1bVxQ6Q=",
+			"origin": "github.com/olivere/elastic/vendor/github.com/mailru/easyjson/buffer",
+			"path": "github.com/mailru/easyjson/buffer",
+			"revision": "e771061479895d1c7dffafd0d90ead7c9456d7cb",
+			"revisionTime": "2018-01-12T10:05:05Z"
+		},
+		{
+			"checksumSHA1": "QA+9yav6Xzq7LmuZUREeOX1hfjk=",
+			"origin": "github.com/olivere/elastic/vendor/github.com/mailru/easyjson/jlexer",
+			"path": "github.com/mailru/easyjson/jlexer",
+			"revision": "e771061479895d1c7dffafd0d90ead7c9456d7cb",
+			"revisionTime": "2018-01-12T10:05:05Z"
+		},
+		{
+			"checksumSHA1": "svJ32su8itWtutcMkP+RzoMsIfw=",
+			"origin": "github.com/olivere/elastic/vendor/github.com/mailru/easyjson/jwriter",
+			"path": "github.com/mailru/easyjson/jwriter",
+			"revision": "e771061479895d1c7dffafd0d90ead7c9456d7cb",
+			"revisionTime": "2018-01-12T10:05:05Z"
+		},
+		{
 			"checksumSHA1": "b0T0Hzd+zYk+OCDTFMps+jwa/nY=",
 			"path": "github.com/manucorporat/sse",
 			"revision": "ee05b128a739a0fb76c7ebd3ae4810c1de808d6d",
@@ -283,6 +311,24 @@
 			"revisionTime": "2015-12-21T08:53:10Z"
 		},
 		{
+			"checksumSHA1": "w8erJpEEaxRbVyb0U0KVcyosFd4=",
+			"path": "github.com/olivere/elastic",
+			"revision": "e771061479895d1c7dffafd0d90ead7c9456d7cb",
+			"revisionTime": "2018-01-12T10:05:05Z"
+		},
+		{
+			"checksumSHA1": "LkxLK7ff1eJbj6Wv9TlLDV96l58=",
+			"path": "github.com/olivere/elastic/config",
+			"revision": "e771061479895d1c7dffafd0d90ead7c9456d7cb",
+			"revisionTime": "2018-01-12T10:05:05Z"
+		},
+		{
+			"checksumSHA1": "AmcqvKDAUGvVsrf8NDCQ/B8cMj4=",
+			"path": "github.com/olivere/elastic/uritemplates",
+			"revision": "e771061479895d1c7dffafd0d90ead7c9456d7cb",
+			"revisionTime": "2018-01-12T10:05:05Z"
+		},
+		{
 			"checksumSHA1": "I0kIkGOtYBit3XflqEqbEt+kuhQ=",
 			"path": "github.com/open-falcon/rrdlite",
 			"revision": "7d8646c85cc56cad1f65d97abbe24fdfc1b88917",
@@ -299,6 +345,13 @@
 			"path": "github.com/pelletier/go-toml",
 			"revision": "23f644976aa7c724adf4aec911dadf4af17840ab",
 			"revisionTime": "2017-05-08T00:14:13Z"
+		},
+		{
+			"checksumSHA1": "xCv4GBFyw07vZkVtKF/XrUnkHRk=",
+			"origin": "github.com/olivere/elastic/vendor/github.com/pkg/errors",
+			"path": "github.com/pkg/errors",
+			"revision": "e771061479895d1c7dffafd0d90ead7c9456d7cb",
+			"revisionTime": "2018-01-12T10:05:05Z"
 		},
 		{
 			"checksumSHA1": "zmC8/3V4ls53DJlNTKDZwPSC/dA=",

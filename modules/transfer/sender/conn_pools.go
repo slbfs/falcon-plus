@@ -18,6 +18,7 @@ import (
 	backend "github.com/open-falcon/falcon-plus/common/backend_pool"
 	"github.com/open-falcon/falcon-plus/modules/transfer/g"
 	nset "github.com/toolkits/container/set"
+	"fmt"
 )
 
 func initConnPools() {
@@ -48,9 +49,11 @@ func initConnPools() {
 
 	//elastic search
 	if cfg.Es.Enabled {
+		for _,item := range cfg.Es.Urls {
+			fmt.Errorf("%s",item)
+		}
 		EsClient = backend.CreateEsClient(cfg.Es.ConnTimeout,cfg.Es.CallTimeout,cfg.Es.Urls)
 	}
-
 }
 
 func DestroyConnPools() {
