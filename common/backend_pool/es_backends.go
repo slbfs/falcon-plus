@@ -2,10 +2,10 @@ package backend_pool
 
 import (
 	"github.com/olivere/elastic"
-	"fmt"
 	"github.com/open-falcon/falcon-plus/common/model"
 	"context"
 	"log"
+	"errors"
 )
 
 //EsClient
@@ -27,45 +27,34 @@ func CreateEsClient(connTimeout int, callTimeout int, urls []string) *EsClient {
 func (t *EsClient) Send(index string, esType string, items []*model.EsItem) (err error) {
 	client := t.cli
 
-	done := make(chan error, 1)
 	ctx := context.Background()
-	go func() {
-		exists, err := client.IndexExists(index).Do(ctx)
-		if err != nil {
-			// Handle error
-			done <- err
-			return
-		}
-		if !exists {
-			err := fmt.Errorf("ES index %s not exist!", index)
-			done <- err
-			return
-		}
-		count := len(items)
-		for i := 0; i < count; i++ {
-			result, err := client.Index().
-				Index(index).
-				Type(esType).
-				BodyJson(items[i]).
-				Do(ctx)
-			if err != nil {
-				// Handle error
-				done <- err
-				continue
-			}
-			log.Printf("Insert to index %s, id %s\n", result.Index, result.Id)
-		}
-	}()
 
-	select {
-	//case <-time.After(time.Duration(t.callTimeout) * time.Millisecond):
-	//	return fmt.Errorf("elasticsearch call timeout.")
-	case err = <-done:
-		if err != nil {
-			log.Printf("Insert to elasticsearch failed, err %v.", err)
-		}
+	exists, err := client.IndexExists(index).Do(ctx)
+	if err != nil {
+		log.Printf("Insert to elasticsearch failed, err %v.\n", err)
 		return err
 	}
+	if !exists {
+		err = errors.New("ES index "+index+" not exist")
+		log.Print(err)
+		return err
+	}
+	count := len(items)
+	for i := 0; i < count; i++ {
+		result, err := client.Index().
+			Index(index).
+			Type(esType).
+			BodyJson(items[i]).
+			Do(ctx)
+		//TODO 修改为bulk
+		if err != nil {
+			log.Printf("Insert to elasticsearch failed, err %v.\n", err)
+			continue
+		}
+		log.Printf("Insert to index %s, id %s\n", result.Index, result.Id)
+	}
+	log.Printf("Once Insert to es comple\n")
+	return err;
 }
 
 

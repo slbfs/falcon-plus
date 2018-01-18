@@ -73,7 +73,7 @@ func startSendTasks() {
 	}
 
 	if cfg.Es.Enabled {
-		go forward2EsTask(1)
+		go forward2EsTask(esConcurrent)
 	}
 }
 
@@ -173,26 +173,26 @@ func forward2GraphTask(Q *list.SafeListLimited, node string, addr string, concur
 func forward2EsTask(concurrent int) {
 	batch := g.Config().Es.Batch // 一次发送,最多batch条数据
 	retry := g.Config().Es.MaxRetry
-
 	sema := nsema.NewSemaphore(concurrent)
 
 	for {
 		items := EsQueue.PopBackBy(batch)
 		count := len(items)
-		log.Printf("exec forward es task, forward count %d.",count)
+
 		if count == 0 {
 			time.Sleep(DefaultSendTaskSleepInterval)
 			continue
 		}
+		log.Printf("exec forward es task, forward count %d.",count)
 		esItems := make([]*cmodel.EsItem, count)
 		for i := 0; i < count; i++ {
 			esItems[i] = items[i].(*cmodel.EsItem)
 		}
-		//  同步Call + 有限并发 进行发送
 		sema.Acquire()
+		log.Printf("exec forward after Semaphore.Acquire.")
 		go func(esItems []*cmodel.EsItem, count int) {
+			log.Printf("exec forward after Semaphore.Release.")
 			defer sema.Release()
-
 			var err error
 			sendOk := false
 			for i := 0; i < retry; i++ {
@@ -211,6 +211,7 @@ func forward2EsTask(concurrent int) {
 			} else {
 				proc.SendToEsCnt.IncrBy(int64(count))
 			}
+			return
 		}(esItems,count)
 	}
 	log.Printf("end forward es task")
