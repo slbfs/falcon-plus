@@ -37,6 +37,7 @@ func startSendTasks() {
 	judgeConcurrent := cfg.Judge.MaxConns
 	graphConcurrent := cfg.Graph.MaxConns
 	tsdbConcurrent := cfg.Tsdb.MaxConns
+	esConcurrent := cfg.Es.MaxConns
 
 	if tsdbConcurrent < 1 {
 		tsdbConcurrent = 1
@@ -48,6 +49,10 @@ func startSendTasks() {
 
 	if graphConcurrent < 1 {
 		graphConcurrent = 1
+	}
+
+	if esConcurrent < 1 {
+		esConcurrent = 1
 	}
 
 	// init send go-routines
@@ -65,6 +70,10 @@ func startSendTasks() {
 
 	if cfg.Tsdb.Enabled {
 		go forward2TsdbTask(tsdbConcurrent)
+	}
+
+	if cfg.Es.Enabled {
+		go forward2EsTask(esConcurrent)
 	}
 }
 
@@ -160,6 +169,52 @@ func forward2GraphTask(Q *list.SafeListLimited, node string, addr string, concur
 	}
 }
 
+// Es定时任务, 将数据通过api发送到elsticsearch
+func forward2EsTask(concurrent int) {
+	batch := g.Config().Es.Batch // 一次发送,最多batch条数据
+	retry := g.Config().Es.MaxRetry
+
+	sema := nsema.NewSemaphore(concurrent)
+
+	for {
+		items := EsQueue.PopBackBy(batch)
+		count := len(items)
+		if count == 0 {
+			time.Sleep(DefaultSendTaskSleepInterval)
+			continue
+		}
+		esItems := make([]*cmodel.EsItem, count)
+		for i := 0; i < count; i++ {
+			esItems[i] = items[i].(*cmodel.EsItem)
+		}
+		//  同步Call + 有限并发 进行发送
+		sema.Acquire()
+		go func(esItems []*cmodel.EsItem, count int) {
+			defer sema.Release()
+
+			var err error
+			sendOk := false
+			for i := 0; i < retry; i++ {
+				err = EsClient.Send("falcon-metric", "metric", esItems)
+				if err == nil {
+					sendOk = true
+					break
+				}
+				time.Sleep(time.Millisecond * 10)
+			}
+
+			// statistics
+			if !sendOk {
+				log.Printf("send to es fail: %v", err)
+				proc.SendToEsFailCnt.IncrBy(int64(count))
+			} else {
+				proc.SendToEsCnt.IncrBy(int64(count))
+			}
+
+		}(esItems,count)
+	}
+}
+
 // Tsdb定时任务, 将数据通过api发送到tsdb
 func forward2TsdbTask(concurrent int) {
 	batch := g.Config().Tsdb.Batch // 一次发送,最多batch条数据
@@ -168,10 +223,12 @@ func forward2TsdbTask(concurrent int) {
 
 	for {
 		items := TsdbQueue.PopBackBy(batch)
-		if len(items) == 0 {
+		count := len(items)
+		if count == 0 {
 			time.Sleep(DefaultSendTaskSleepInterval)
 			continue
 		}
+
 		//  同步Call + 有限并发 进行发送
 		sema.Acquire()
 		go func(itemList []interface{}) {

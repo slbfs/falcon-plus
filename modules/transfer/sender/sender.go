@@ -23,6 +23,7 @@ import (
 	rings "github.com/toolkits/consistent/rings"
 	nlist "github.com/toolkits/container/list"
 	"log"
+	"time"
 )
 
 const (
@@ -45,6 +46,7 @@ var (
 // node -> queue_of_data
 var (
 	TsdbQueue   *nlist.SafeListLimited
+	EsQueue 	*nlist.SafeListLimited
 	JudgeQueues = make(map[string]*nlist.SafeListLimited)
 	GraphQueues = make(map[string]*nlist.SafeListLimited)
 )
@@ -56,6 +58,8 @@ var (
 	TsdbConnPoolHelper *backend.TsdbConnPoolHelper
 	GraphConnPools     *backend.SafeRpcConnPools
 )
+
+var EsClient *backend.EsClient
 
 // 初始化数据发送服务, 在main函数中调用
 func Start() {
@@ -195,6 +199,20 @@ func Push2TsdbSendQueue(items []*cmodel.MetaData) {
 	}
 }
 
+// 将原始数据入到tsdb发送缓存队列
+func Push2EsSendQueue(items []*cmodel.MetaData) {
+	for _, item := range items {
+		//TODO convert
+		esItem := convert2EsItem(item)
+		isSuccess := EsQueue.PushFront(esItem)
+
+		if !isSuccess {
+			proc.SendToEsDropCnt.Incr()
+		}
+	}
+}
+
+
 // 转化为tsdb格式
 func convert2TsdbItem(d *cmodel.MetaData) *cmodel.TsdbItem {
 	t := cmodel.TsdbItem{Tags: make(map[string]string)}
@@ -206,6 +224,24 @@ func convert2TsdbItem(d *cmodel.MetaData) *cmodel.TsdbItem {
 	t.Metric = d.Metric
 	t.Timestamp = d.Timestamp
 	t.Value = d.Value
+	return &t
+}
+
+// 转化为es格式
+func convert2EsItem(d *cmodel.MetaData) *cmodel.EsItem {
+	t := cmodel.EsItem{Tags: make(map[string]string)}
+
+	for k, v := range d.Tags {
+		t.Tags[k] = v
+	}
+
+	t.Endpoint = d.Endpoint
+	t.CounterType = d.CounterType
+	t.Metric = d.Metric
+	t.Value = d.Value
+	t.Step = d.Step
+
+	t.Timestamp = time.Unix(d.Timestamp,0)
 	return &t
 }
 

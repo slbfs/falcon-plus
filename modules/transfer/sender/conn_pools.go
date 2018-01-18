@@ -46,6 +46,11 @@ func initConnPools() {
 	GraphConnPools = backend.CreateSafeRpcConnPools(cfg.Graph.MaxConns, cfg.Graph.MaxIdle,
 		cfg.Graph.ConnTimeout, cfg.Graph.CallTimeout, graphInstances.ToSlice())
 
+	//elastic search
+	if cfg.Es.Enabled {
+		EsClient = backend.CreateEsClient(cfg.Es.ConnTimeout,cfg.Es.CallTimeout,cfg.Es.Urls)
+	}
+
 }
 
 func DestroyConnPools() {

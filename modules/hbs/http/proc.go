@@ -54,7 +54,7 @@ func configProcRoutes() {
 		RenderDataJson(w, data)
 	})
 
-	http.HandleFunc("/plugins/", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/plupluginsgins/", func(w http.ResponseWriter, r *http.Request) {
 		hostname := r.URL.Path[len("/plugins/"):]
 		RenderDataJson(w, cache.GetPlugins(hostname))
 	})
