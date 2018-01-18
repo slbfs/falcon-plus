@@ -195,6 +195,8 @@ func Push2TsdbSendQueue(items []*cmodel.MetaData) {
 
 		if !isSuccess {
 			proc.SendToTsdbDropCnt.Incr()
+		} else {
+			proc.TsdbQueuesCnt.SetCnt(int64(TsdbQueue.Len()))
 		}
 	}
 }
@@ -208,6 +210,8 @@ func Push2EsSendQueue(items []*cmodel.MetaData) {
 
 		if !isSuccess {
 			proc.SendToEsDropCnt.Incr()
+		} else {
+			proc.EsQueuesCnt.SetCnt(int64(EsQueue.Len()))
 		}
 	}
 }

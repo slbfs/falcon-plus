@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/open-falcon/falcon-plus/common/model"
 	"context"
+	"log"
 )
 
 //EsClient
@@ -52,7 +53,7 @@ func (t *EsClient) Send(index string, esType string, items []*model.EsItem) (err
 				done <- err
 				continue
 			}
-			fmt.Printf("Insert to index %s, id %s\n", result.Index, result.Id)
+			log.Printf("Insert to index %s, id %s\n", result.Index, result.Id)
 		}
 	}()
 
@@ -61,7 +62,7 @@ func (t *EsClient) Send(index string, esType string, items []*model.EsItem) (err
 	//	return fmt.Errorf("elasticsearch call timeout.")
 	case err = <-done:
 		if err != nil {
-			err = fmt.Errorf("insert to elasticsearch failed, err %v.", err)
+			log.Printf("Insert to elasticsearch failed, err %v.", err)
 		}
 		return err
 	}

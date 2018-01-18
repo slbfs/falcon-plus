@@ -73,7 +73,7 @@ func startSendTasks() {
 	}
 
 	if cfg.Es.Enabled {
-		go forward2EsTask(esConcurrent)
+		go forward2EsTask(1)
 	}
 }
 
@@ -179,6 +179,7 @@ func forward2EsTask(concurrent int) {
 	for {
 		items := EsQueue.PopBackBy(batch)
 		count := len(items)
+		log.Printf("exec forward es task, forward count %d.",count)
 		if count == 0 {
 			time.Sleep(DefaultSendTaskSleepInterval)
 			continue
@@ -210,9 +211,9 @@ func forward2EsTask(concurrent int) {
 			} else {
 				proc.SendToEsCnt.IncrBy(int64(count))
 			}
-
 		}(esItems,count)
 	}
+	log.Printf("end forward es task")
 }
 
 // Tsdb定时任务, 将数据通过api发送到tsdb
